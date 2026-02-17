@@ -9,7 +9,7 @@ client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 response = client.chat.completions.create(
     model="llama-3.1-8b-instant",
     messages=[
-        {"role": "user", "content": "Donne une description courte du rock."}
+        {"role": "user", "content": "Donne une description courte du rap."}
     ]
 )
 
