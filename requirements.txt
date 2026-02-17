@@ -4,4 +4,3 @@ scipy
 requests
 python-dotenv
 groq
-acrcloud
