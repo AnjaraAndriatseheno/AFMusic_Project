@@ -1,68 +1,28 @@
 import streamlit as st
 from streamlit_mic_recorder import mic_recorder
+import os
+from dotenv import load_dotenv
 
+load_dotenv()
 
-st.set_page_config(
-    page_title="AFMusic",
-    page_icon="🎧",
-    layout="centered"
-)
+st.title("🎵 AFMusic - Test Micro")
 
+st.write("Étape de validation : Enregistre-toi pour vérifier que le micro fonctionne.")
 
-st.markdown("""
-<style>
-.title {
-    text-align: center;
-    font-size: 3rem;
-    font-weight: 700;
-    margin-bottom: 25px;
-}
-
-.card {
-    background-color: #161b22;
-    padding: 25px;
-    border-radius: 14px;
-    margin-top: 20px;
-    box-shadow: 0 6px 25px rgba(0,0,0,0.35);
-}
-</style>
-""", unsafe_allow_html=True)
-
-
-st.markdown('<div class="title">🎵 AFMusic</div>', unsafe_allow_html=True)
-
-st.write("Clique sur le bouton pour écouter et reconnaître la musique")
-
-
+# Le bouton de ton collègue
 audio = mic_recorder(
     start_prompt="Lancer l’écoute",
     stop_prompt="Stop",
-    just_once=True,
-    use_container_width=True
+    just_once=True
 )
 
-
 if audio:
-
+    # 1. On affiche le lecteur audio pour vérifier le son
     st.audio(audio["bytes"])
+    st.success("L'audio a été capturé avec succès !")
 
-    st.info("Analyse du son en cours...")
-
-    # 👉 ICI TU METS TON APPEL ACRCloud
-    # Exemple données simulées
-    title = "Blinding Lights"
-    artist = "The Weeknd"
-    description = "Titre pop synthwave sorti en 2019."
-    similar_tracks = ["Save Your Tears", "In Your Eyes"]
-
-    st.markdown('<div class="card">', unsafe_allow_html=True)
-
-    st.subheader(f"🎶 {title}")
-    st.write(f"**Artiste :** {artist}")
-    st.write(description)
-
-    st.markdown("### 🎧 Autres titres du même artiste")
-    for track in similar_tracks:
-        st.write(f"• {track}")
-
-    st.markdown('</div>', unsafe_allow_html=True)
+    # 2. On enregistre en fichier WAV pour l'étape suivante (Reconnaissance)
+    with open("mon_chantonnement.wav", "wb") as f:
+        f.write(audio["bytes"])
+    
+    st.write("Fichier 'mon_chantonnement.wav' créé avec succès.")
