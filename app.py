@@ -61,7 +61,7 @@ if audio:
     st.write(f"**Artiste :** {artist}")
     st.write(description)
 
-    st.markdown("### 🎧 Autres titres du même artiste")
+    st.markdown("### Autres titres du même artiste")
     for track in similar_tracks:
         st.write(f"• {track}")
 
