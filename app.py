@@ -13,7 +13,7 @@ st.markdown("""
 <style>
 .title {
     text-align: center;
-    font-size: 3rem;
+    font-size: 5rem;
     font-weight: 700;
     margin-bottom: 25px;
 }
@@ -48,8 +48,6 @@ if audio:
 
     st.info("Analyse du son en cours...")
 
-    # 👉 ICI TU METS TON APPEL ACRCloud
-    # Exemple données simulées
     title = "Blinding Lights"
     artist = "The Weeknd"
     description = "Titre pop synthwave sorti en 2019."
