@@ -1,28 +1,31 @@
 import streamlit as st
 from streamlit_mic_recorder import mic_recorder
-import os
-from dotenv import load_dotenv
+from recognition import identifier_chantonnement  # Import du Back-end reconnaissance
+from llm import generate_music_insights         # Import du Back-end IA
 
-load_dotenv()
+# --- DESIGN (Front-end) ---
+st.set_page_config(page_title="AFMusic", page_icon="🎧")
+st.markdown('<div class="title">🎵 AFMusic</div>', unsafe_allow_html=True) # Utilise le CSS de ton collègue
 
-st.title("🎵 AFMusic - Test Micro")
-
-st.write("Étape de validation : Enregistre-toi pour vérifier que le micro fonctionne.")
-
-# Le bouton de ton collègue
-audio = mic_recorder(
-    start_prompt="Lancer l’écoute",
-    stop_prompt="Stop",
-    just_once=True
-)
+audio = mic_recorder(start_prompt="Lancer l’écoute", stop_prompt="Stop")
 
 if audio:
-    # 1. On affiche le lecteur audio pour vérifier le son
+    # On reste dans l'interface : on affiche ce qu'on fait
     st.audio(audio["bytes"])
-    st.success("L'audio a été capturé avec succès !")
-
-    # 2. On enregistre en fichier WAV pour l'étape suivante (Reconnaissance)
-    with open("mon_chantonnement.wav", "wb") as f:
-        f.write(audio["bytes"])
     
-    st.write("Fichier 'mon_chantonnement.wav' créé avec succès.")
+    with st.spinner("Analyse en cours..."):
+        # ON APPELLE LE BACK-END ICI
+        titre, artiste = identifier_chantonnement(audio["bytes"])
+        
+        if titre:
+            # ON APPELLE LE DEUXIÈME BACK-END (IA)
+            infos_ia = generate_music_insights(titre, artiste)
+            
+            # AFFICHAGE FRONT-END (Dans la card du collègue)
+            st.markdown('<div class="card">', unsafe_allow_html=True)
+            st.subheader(f"🎶 {titre}")
+            st.write(f"**Artiste :** {artiste}")
+            st.info(infos_ia.get('song_description'))
+            st.markdown('</div>', unsafe_allow_html=True)
+        else:
+            st.error("Musique non reconnue.") 
