@@ -8,7 +8,7 @@ def identifier_chantonnement(audio_bytes):
     """
     Envoie les données audio à l'API AudD pour identifier le chantonnement.
     """
-    url = "https://api.audd.io/recognizeWithOffset/v2/"
+    url = os.getenv("AUDD_URL")
     api_token = os.getenv("AUDD_API_KEY")
     
     # On prépare le fichier audio (les octets provenant du micro)
