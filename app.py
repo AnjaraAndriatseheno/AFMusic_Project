@@ -1,31 +1,60 @@
 import streamlit as st
 from streamlit_mic_recorder import mic_recorder
-from recognition import identifier_chantonnement  # Import du Back-end reconnaissance
-from llm import generate_music_insights         # Import du Back-end IA
 
-# --- DESIGN (Front-end) ---
-st.set_page_config(page_title="AFMusic", page_icon="🎧")
-st.markdown('<div class="title">🎵 AFMusic</div>', unsafe_allow_html=True) # Utilise le CSS de ton collègue
+
+st.set_page_config(
+    page_title="AFMusic",
+    page_icon="🎧",
+    layout="centered"
+)
+
+
+st.markdown("""
+<style>
+.title {
+    text-align: center;
+    font-size: 5rem;
+    font-weight: 700;
+    margin-bottom: 25px;
+}
+
+.card {
+    background-color: #161b22;
+    padding: 25px;
+    border-radius: 14px;
+    margin-top: 20px;
+    box-shadow: 0 6px 25px rgba(0,0,0,0.35);
+}
+</style>
+""", unsafe_allow_html=True)
+
+
+st.markdown('<div class="title">🎵 AFMusic</div>', unsafe_allow_html=True)
+
+st.write("Clique sur le bouton pour écouter et reconnaître la musique")
+
 
 audio = mic_recorder(start_prompt="Lancer l’écoute", stop_prompt="Stop")
 
 if audio:
     # On reste dans l'interface : on affiche ce qu'on fait
     st.audio(audio["bytes"])
-    
-    with st.spinner("Analyse en cours..."):
-        # ON APPELLE LE BACK-END ICI
-        titre, artiste = identifier_chantonnement(audio["bytes"])
-        
-        if titre:
-            # ON APPELLE LE DEUXIÈME BACK-END (IA)
-            infos_ia = generate_music_insights(titre, artiste)
-            
-            # AFFICHAGE FRONT-END (Dans la card du collègue)
-            st.markdown('<div class="card">', unsafe_allow_html=True)
-            st.subheader(f"🎶 {titre}")
-            st.write(f"**Artiste :** {artiste}")
-            st.info(infos_ia.get('song_description'))
-            st.markdown('</div>', unsafe_allow_html=True)
-        else:
-            st.error("Musique non reconnue.") 
+
+    st.info("Analyse du son en cours...")
+
+    title = "Blinding Lights"
+    artist = "The Weeknd"
+    description = "Titre pop synthwave sorti en 2019."
+    similar_tracks = ["Save Your Tears", "In Your Eyes"]
+
+    st.markdown('<div class="card">', unsafe_allow_html=True)
+
+    st.subheader(f"🎶 {title}")
+    st.write(f"**Artiste :** {artist}")
+    st.write(description)
+
+    st.markdown("### 🎧 Autres titres du même artiste")
+    for track in similar_tracks:
+        st.write(f"• {track}")
+
+    st.markdown('</div>', unsafe_allow_html=True)
