@@ -1,5 +1,7 @@
 import streamlit as st
 from streamlit_mic_recorder import mic_recorder
+from recognition import identifier_chantonnement  
+from llm import generate_music_insights   
 
 
 st.set_page_config(
@@ -40,21 +42,19 @@ if audio:
     # On reste dans l'interface : on affiche ce qu'on fait
     st.audio(audio["bytes"])
 
-    st.info("Analyse du son en cours...")
-
-    title = "Blinding Lights"
-    artist = "The Weeknd"
-    description = "Titre pop synthwave sorti en 2019."
-    similar_tracks = ["Save Your Tears", "In Your Eyes"]
-
-    st.markdown('<div class="card">', unsafe_allow_html=True)
-
-    st.subheader(f"🎶 {title}")
-    st.write(f"**Artiste :** {artist}")
-    st.write(description)
-
-    st.markdown("### 🎧 Autres titres du même artiste")
-    for track in similar_tracks:
-        st.write(f"• {track}")
-
-    st.markdown('</div>', unsafe_allow_html=True)
+    with st.spinner("Analyse en cours..."):
+        # ON APPELLE LE BACK-END ICI
+        titre, artiste = identifier_chantonnement(audio["bytes"])
+        
+        if titre:
+            # ON APPELLE LE DEUXIÈME BACK-END (IA)
+            infos_ia = generate_music_insights(titre, artiste)
+            
+            # AFFICHAGE FRONT-END (Dans la card du collègue)
+            st.markdown('<div class="card">', unsafe_allow_html=True)
+            st.subheader(f"🎶 {titre}")
+            st.write(f"**Artiste :** {artiste}")
+            st.info(infos_ia.get('song_description'))
+            st.markdown('</div>', unsafe_allow_html=True)
+        else:
+            st.error("Musique non reconnue.") 
