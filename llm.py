@@ -10,12 +10,20 @@ def generate_music_insights(title, artist):
     """
 
     prompt = f"""
-    Donne des informations sur la chanson "{title}" de {artist}.
+    Tu es un assistant spécialisé en musique.
+
+    Pour la chanson "{title}" de {artist}, fournis des informations fiables.
+
+    IMPORTANT :
+    - N'invente aucune information.
+    - Si tu n'es pas sûr, indique "Information non disponible".
+    - Les autres chansons doivent être des titres réels connus de l'artiste de la chanson reconnu.
+
     Réponds STRICTEMENT en JSON avec :
 
     artist_description
     song_description
-    other_songs (liste de 3 titres)
+    other_songs (liste de 3 titres maximum)
     """
 
     response = client.chat.completions.create(
