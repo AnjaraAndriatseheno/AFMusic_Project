@@ -5,9 +5,9 @@ load_dotenv(dotenv_path=Path(__file__).resolve().parent / ".env")
 import streamlit as st
 from streamlit_mic_recorder import mic_recorder
 from recognition import identifier_chantonnement
-from llm import generate_music_insights
+from llm import generate_description
 
-st.set_page_config(page_title="AFMusic", page_icon="🎧", layout="centered" )
+st.set_page_config(page_title="AFMusic",layout="centered" )
 
 st.markdown("""
 <style>
@@ -73,7 +73,7 @@ st.markdown("""
 
 
 
-st.markdown('<div class="app-title">🎵 AFMusic</div>', unsafe_allow_html=True)
+st.markdown('<div class="app-title">AFMusic</div>', unsafe_allow_html=True)
 st.write("Clique sur le bouton pour reconnaître une musique")
 
 audio = mic_recorder(start_prompt="Lancer l’écoute", stop_prompt="Stop")
@@ -95,7 +95,7 @@ if audio:
 
         if titre:
 
-            infos = generate_music_insights(titre, artiste)
+            infos = generate_description(titre, artiste)
 
             st.markdown('<div class="result-card">', unsafe_allow_html=True)
 
@@ -111,7 +111,7 @@ if audio:
             st.markdown('<div class="section-title">MORE FROM THIS ARTIST</div>', unsafe_allow_html=True)
 
             for song in infos.get("other_songs", []):
-                st.markdown(f"🎵 {song}")
+                st.markdown(f"{song}")
 
             st.markdown('</div>', unsafe_allow_html=True)
 

@@ -4,7 +4,7 @@ import json
 
 client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
-def generate_music_insights(title, artist):
+def generate_description(title, artist):
     """
     Génère des informations enrichies sur une musique via Groq
     """

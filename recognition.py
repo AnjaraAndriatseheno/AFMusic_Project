@@ -1,32 +1,71 @@
 import requests
 import os
+import time
+import hmac
+import hashlib
+import base64
 from dotenv import load_dotenv
 
 load_dotenv()
 
 def identifier_chantonnement(audio_bytes):
-    """
-    Envoie les données audio à l'API AudD pour identifier le chantonnement.
-    """
-    url = os.getenv("ACR_URL")
-    api_token = os.getenv("AUDD_API_KEY")
-    
-    # On prépare le fichier audio (les octets provenant du micro)
-    files = {'file': audio_bytes}
-    data = {'api_token': api_token}
-    
+
+    host = os.getenv("ACR_HOST")
+    access_key = os.getenv("ACR_ACCESS_KEY")
+    access_secret = os.getenv("ACR_ACCESS_SECRET")
+
+    http_method = "POST"
+    http_uri = "/v1/identify"
+    data_type = "audio"
+    signature_version = "1"
+
+    timestamp = str(int(time.time()))
+
+    # Création de la signature pour ACRCloud
+    string_to_sign = "\n".join([
+        http_method,
+        http_uri,
+        access_key,
+        data_type,
+        signature_version,
+        timestamp
+    ])
+
+    sign = base64.b64encode(
+        hmac.new(
+            access_secret.encode("utf-8"),
+            string_to_sign.encode("utf-8"),
+            hashlib.sha1
+        ).digest()
+    ).decode("utf-8")
+
+    url = f"https://{host}{http_uri}"
+
+    files = {
+        "sample": audio_bytes
+    }
+
+    data = {
+        "access_key": access_key,
+        "data_type": data_type,
+        "signature_version": signature_version,
+        "signature": sign,
+        "timestamp": timestamp
+    }
+
     try:
-        # Appel à l'API spécialisée Humming/chantonnement
-        response = requests.post(url, data=data, files=files)
-        resultat = response.json()
-        
-        if resultat.get('status') == 'success' and resultat.get('result'):
-            # On récupère le meilleur résultat (le premier de la liste)
-            musique = resultat['result']['list'][0]
-            return musique['title'], musique['artist']
-            
+        response = requests.post(url, files=files, data=data)
+        result = response.json()
+
+        if result["status"]["msg"] == "Success":
+            music = result["metadata"]["music"][0]
+
+            title = music["title"]
+            artist = music["artists"][0]["name"]
+
+            return title, artist
+
     except Exception as e:
-        print(f"Erreur technique reconnaissance : {e}")
-        
-    # Si rien n'est trouvé ou s'il y a une erreur
+        print("Erreur reconnaissance :", e)
+
     return None, None
