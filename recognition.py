@@ -22,7 +22,7 @@ def identifier_musique(audio_bytes):
     print("Texte détecté :", texte)
 
     # ❗ ignorer silence ou bruit
-    if len(texte) < 5:
+    if len(texte) < 3:
         return None, None
 
     prompt = f"""

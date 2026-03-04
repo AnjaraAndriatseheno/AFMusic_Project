@@ -42,6 +42,9 @@ if audio:
             st.markdown("### ARTIST")
             st.write(infos.get("artist_description"))
 
+            st.markdown("### SONG DESCRIPTION")
+            st.write(infos.get("song_description"))
+
             st.markdown("### AUTRES CHANSONS")
 
             for song in infos.get("other_songs", []):

@@ -22,12 +22,14 @@ def generate_description(title, artist):
     Instructions :
     - N'invente aucune information.
     - Si tu n'es pas sûr, laisse le champ vide.
+    - Donne une description du son en 2 phrases max.
     - Donne exactement 3 chansons populaires du même artiste.
     - Ne répète pas "{title}".
 
     Réponds uniquement en JSON :
 
     {{
+      "song_description":"",  
       "artist_description": "",
       "other_songs": ["", "", ""]
     }}
