@@ -1,44 +1,53 @@
-from groq import Groq
 import os
 import json
+import re
+from groq import Groq
+from dotenv import load_dotenv
+
+load_dotenv()
 
 client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
+
 def generate_description(title, artist):
-    """
-    Génère des informations enrichies sur une musique via Groq
-    """
 
     prompt = f"""
-    Tu es un assistant spécialisé en musique.
+    Tu es un expert en musique.
 
-    Pour la chanson "{title}" de {artist}, fournis des informations fiables.
+    Donne uniquement des informations réelles et connues sur cet artiste.
 
-    IMPORTANT :
+    Titre de la chanson : {title}
+    Artiste : {artist}
+
+    Instructions :
     - N'invente aucune information.
-    - Si tu n'es pas sûr, indique "Information non disponible".
-    - Les autres chansons doivent être des titres réels connus de l'artiste de la chanson reconnu.
+    - Si tu n'es pas sûr, laisse le champ vide.
+    - Donne exactement 3 chansons populaires du même artiste.
+    - Ne répète pas "{title}".
 
-    Réponds STRICTEMENT en JSON avec :
+    Réponds uniquement en JSON :
 
-    artist_description
-    song_description
-    other_songs (liste de 3 titres maximum)
+    {{
+      "artist_description": "",
+      "other_songs": ["", "", ""]
+    }}
     """
 
     response = client.chat.completions.create(
         model="llama-3.1-8b-instant",
+        temperature=0.2,
         messages=[{"role": "user", "content": prompt}]
     )
 
     content = response.choices[0].message.content
 
     try:
-        data = json.loads(content)
-    except Exception:
+        json_match = re.search(r"\{.*\}", content, re.DOTALL)
+        data = json.loads(json_match.group())
+
+    except:
         data = {
-            "artist_description": content,
-            "song_description": "",
+            "artist_description": "",
             "other_songs": []
         }
 

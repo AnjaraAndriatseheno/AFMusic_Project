@@ -1,71 +1,66 @@
-import requests
 import os
-import time
-import hmac
-import hashlib
-import base64
+import json
+import re
+from groq import Groq
 from dotenv import load_dotenv
 
 load_dotenv()
 
-def identifier_chantonnement(audio_bytes):
+client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
-    host = os.getenv("ACR_HOST")
-    access_key = os.getenv("ACR_ACCESS_KEY")
-    access_secret = os.getenv("ACR_ACCESS_SECRET")
 
-    http_method = "POST"
-    http_uri = "/v1/identify"
-    data_type = "audio"
-    signature_version = "1"
+def identifier_musique(audio_bytes):
 
-    timestamp = str(int(time.time()))
+    transcription = client.audio.transcriptions.create(
+        file=("audio.wav", audio_bytes),
+        model="whisper-large-v3"
+    )
 
-    # Création de la signature pour ACRCloud
-    string_to_sign = "\n".join([
-        http_method,
-        http_uri,
-        access_key,
-        data_type,
-        signature_version,
-        timestamp
-    ])
+    texte = transcription.text.strip()
 
-    sign = base64.b64encode(
-        hmac.new(
-            access_secret.encode("utf-8"),
-            string_to_sign.encode("utf-8"),
-            hashlib.sha1
-        ).digest()
-    ).decode("utf-8")
+    # DEBUG pour la démo
+    print("Texte détecté :", texte)
 
-    url = f"https://{host}{http_uri}"
+    # ❗ ignorer silence ou bruit
+    if len(texte) < 5:
+        return None, None
 
-    files = {
-        "sample": audio_bytes
-    }
+    prompt = f"""
+    Un utilisateur prononce des paroles ou le titre d'une chanson.
 
-    data = {
-        "access_key": access_key,
-        "data_type": data_type,
-        "signature_version": signature_version,
-        "signature": sign,
-        "timestamp": timestamp
-    }
+    Texte entendu :
+    {texte}
+
+    Identifie la chanson seulement si tu es sûr.
+
+    Si tu n'es pas sûr réponds :
+
+    {{"title": null, "artist": null}}
+
+    Sinon réponds uniquement en JSON :
+
+    {{
+      "title": "",
+      "artist": ""
+    }}
+    """
+
+    response = client.chat.completions.create(
+        model="llama-3.1-8b-instant",
+        temperature=0.2,
+        messages=[{"role": "user", "content": prompt}]
+    )
+
+    content = response.choices[0].message.content
 
     try:
-        response = requests.post(url, files=files, data=data)
-        result = response.json()
+        json_match = re.search(r"\{.*\}", content, re.DOTALL)
+        data = json.loads(json_match.group())
 
-        if result["status"]["msg"] == "Success":
-            music = result["metadata"]["music"][0]
+        if not data["title"]:
+            return None, None
 
-            title = music["title"]
-            artist = music["artists"][0]["name"]
+        return data["title"], data["artist"]
 
-            return title, artist
-
-    except Exception as e:
-        print("Erreur reconnaissance :", e)
-
-    return None, None
+    except:
+        return None, None
