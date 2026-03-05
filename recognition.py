@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-def identifier_chantonnement(audio_bytes):
+def identifier_musique(audio_bytes):
     """
     Envoie les données audio à l'API AudD pour identifier le chantonnement.
     """
