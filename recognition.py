@@ -9,7 +9,7 @@ load_dotenv()
 client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
 
-def identifier_musique(audio_bytes):
+def identifier_chantonnement(audio_bytes):
 
     transcription = client.audio.transcriptions.create(
         file=("audio.wav", audio_bytes),

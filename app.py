@@ -4,7 +4,7 @@ load_dotenv(dotenv_path=Path(__file__).resolve().parent / ".env")
 
 import streamlit as st
 from streamlit_mic_recorder import mic_recorder
-from recognition import identifier_musique
+from recognition import identifier_chantonnement
 from llm import generate_description
 
 st.set_page_config(page_title="AFMusic", layout="centered")
@@ -28,7 +28,7 @@ if audio:
 
     with st.spinner("Analyse de la musique..."):
 
-        titre, artiste = identifier_musique(audio["bytes"])
+        titre, artiste = identifier_chantonnement(audio["bytes"])
 
         if titre:
 
