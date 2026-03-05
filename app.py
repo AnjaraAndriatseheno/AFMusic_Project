@@ -9,24 +9,24 @@ from llm import generate_description
 
 st.set_page_config(page_title="AFMusic", layout="centered")
 
-st.markdown("## 🎵 AFMusic")
-st.write("Dis ou chante quelques paroles d'une chanson")
+st.title("🎵 AFMusic")
+st.write("Dis ou prononce quelques paroles d'une chanson")
 
 audio = mic_recorder(start_prompt="🎤 Lancer l’écoute", stop_prompt="⏹ Stop")
 
 if not audio:
-    st.write("Clique sur le micro pour commencer")
+    st.info("Clique sur le micro pour commencer")
 
 if audio:
 
-    # filtre audio trop court
+    # Filtre silence
     if len(audio["bytes"]) < 2000:
         st.warning("Aucun son détecté")
         st.stop()
 
     st.audio(audio["bytes"])
 
-    with st.spinner("Analyse en cours..."):
+    with st.spinner("Analyse de la musique..."):
 
         titre, artiste = identifier_musique(audio["bytes"])
 
@@ -34,21 +34,37 @@ if audio:
 
             infos = generate_description(titre, artiste)
 
-            st.markdown("### 🎵 Résultat")
+            st.markdown("---")
 
-            st.markdown(f"**{infos['title']}**")
-            st.markdown(f"*{infos['artist']}*")
+            st.subheader(" Résultat")
 
-            st.markdown("### ARTIST")
-            st.write(infos.get("artist_description"))
+            st.markdown(f"### {infos['title']}")
+            st.markdown(f"**Artiste :** {infos['artist']}")
 
-            st.markdown("### SONG DESCRIPTION")
+            # Infos supplémentaires
+            if infos.get("genre"):
+                st.write(f" **Genre :** {infos['genre']}")
+
+            if infos.get("year"):
+                st.write(f"**Année :** {infos['year']}")
+
+            st.markdown("---")
+
+            # Description chanson
+            st.markdown("###  À propos de la chanson")
             st.write(infos.get("song_description"))
 
-            st.markdown("### AUTRES CHANSONS")
+            # Description artiste
+            st.markdown("###  À propos de l'artiste")
+            st.write(infos.get("artist_description"))
+
+            st.markdown("---")
+
+            # Autres chansons
+            st.markdown("###  Autres chansons de l'artiste")
 
             for song in infos.get("other_songs", []):
-                st.write("🎵", song)
+                st.write("", song)
 
         else:
             st.error("Musique non reconnue")
