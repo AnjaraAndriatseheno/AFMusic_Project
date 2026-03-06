@@ -9,17 +9,17 @@ from llm import generate_description
 
 st.set_page_config(page_title="AFMusic", layout="centered")
 
-st.title("🎵 AFMusic")
+st.title("AFMusic")
 st.write("Dis ou prononce quelques paroles d'une chanson")
 
-audio = mic_recorder(start_prompt="🎤 Lancer l’écoute", stop_prompt="⏹ Stop")
+audio = mic_recorder(start_prompt="Lancer l’écoute", stop_prompt="⏹ Stop")
 
 if not audio:
     st.info("Clique sur le micro pour commencer")
 
 if audio:
 
-    # Filtre silence
+    
     if len(audio["bytes"]) < 2000:
         st.warning("Aucun son détecté")
         st.stop()
@@ -41,7 +41,13 @@ if audio:
             st.markdown(f"### {infos['title']}")
             st.markdown(f"**Artiste :** {infos['artist']}")
 
-            # Infos supplémentaires
+            
+            youtube_query = f"{infos['title']} {infos['artist']}".replace(" ", "+")
+            youtube_url = f"https://www.youtube.com/results?search_query={youtube_query}"
+
+            st.markdown(f"▶️ [Écouter la chanson sur YouTube]({youtube_url})")
+
+          
             if infos.get("genre"):
                 st.write(f" **Genre :** {infos['genre']}")
 
@@ -50,17 +56,17 @@ if audio:
 
             st.markdown("---")
 
-            # Description chanson
+           
             st.markdown("###  À propos de la chanson")
             st.write(infos.get("song_description"))
 
-            # Description artiste
+            
             st.markdown("###  À propos de l'artiste")
             st.write(infos.get("artist_description"))
 
             st.markdown("---")
 
-            # Autres chansons
+           
             st.markdown("###  Autres chansons de l'artiste")
 
             for song in infos.get("other_songs", []):

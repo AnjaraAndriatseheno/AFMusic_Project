@@ -18,10 +18,8 @@ def identifier_chantonnement(audio_bytes):
 
     texte = transcription.text.strip()
 
-    # DEBUG pour la démo
     print("Texte détecté :", texte)
 
-    # ❗ ignorer silence ou bruit
     if len(texte) < 3:
         return None, None
 
