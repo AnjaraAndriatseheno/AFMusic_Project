@@ -12,39 +12,39 @@ client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 def generate_description(title, artist):
 
     prompt = f"""
-    Tu es un expert en musique et en culture musicale.
+Tu es un expert en musique et en culture musicale.
 
-    Fournis uniquement des informations réelles et connues sur cette chanson et cet artiste.
+Fournis uniquement des informations réelles et connues sur cette chanson et cet artiste.
 
-    Informations connues :
+Informations connues :
 
-    Titre : {title}
-    Artiste : {artist}
+Titre : {title}
+Artiste : {artist}
 
-    Instructions importantes :
+Instructions importantes :
 
-    - N'invente aucune information.
-    - Si tu n'es pas sûr d'une information, laisse le champ vide ("").
-    - La description de la chanson doit contenir 3 à 4 phrases.
-    - La description de l'artiste doit contenir 4 à 5 phrases.
-    - Les descriptions doivent être informatives, factuelles et claires.
-    - other_songs doit contenir exactement 3 chansons populaires du même artiste.
-    - Ne répète jamais la chanson "{title}" dans other_songs.
-    - Réponds uniquement avec un objet JSON valide.
-    - N'ajoute aucun texte avant ou après le JSON.
+- N'invente aucune information.
+- Si tu n'es pas sûr d'une information, laisse le champ vide ("").
+- La description de la chanson doit contenir 3 à 4 phrases.
+- La description de l'artiste doit contenir 4 à 5 phrases.
+- Les descriptions doivent être informatives, factuelles et claires.
+- other_songs doit contenir exactement 3 chansons populaires du même artiste.
+- Ne répète jamais la chanson "{title}" dans other_songs.
+- Réponds uniquement avec un objet JSON valide.
+- N'ajoute aucun texte avant ou après le JSON.
 
-    Format de réponse attendu :
+Format de réponse attendu :
 
-    {{
-    "title": "{title}",
-    "artist": "{artist}",
-    "song_description": "",
-    "artist_description": "",
-    "genre": "",
-    "year": "",
-    "other_songs": ["", "", ""]
-    }}
-    """
+{{
+"title": "{title}",
+"artist": "{artist}",
+"song_description": "",
+"artist_description": "",
+"genre": "",
+"year": "",
+"other_songs": ["", "", ""]
+}}
+"""
 
     response = client.chat.completions.create(
         model="llama-3.1-8b-instant",
@@ -68,4 +68,4 @@ def generate_description(title, artist):
         "title": title,
         "artist": artist,
         **data
-    }   
+    }
